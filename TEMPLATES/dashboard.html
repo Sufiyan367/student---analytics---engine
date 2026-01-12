@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Student Analytics Engine</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:Segoe UI,Arial;
+    background:#0f172a;
+    color:white;
+}
+
+header{
+    padding:20px;
+    background:#020617;
+    text-align:center;
+    font-size:26px;
+    font-weight:700;
+    letter-spacing:1px;
+    border-bottom:2px solid #1e293b;
+}
+
+.dashboard{
+    display:grid;
+    grid-template-columns: 2fr 1fr;
+    height: calc(100vh - 80px);
+}
+
+.left{
+    padding:15px;
+    overflow:auto;
+}
+
+.right{
+    padding:15px;
+    display:grid;
+    grid-template-rows:1fr 1fr;
+    gap:15px;
+}
+
+.card{
+    background:#020617;
+    border-radius:12px;
+    box-shadow:0 0 15px rgba(0,255,255,0.15);
+    padding:15px;
+}
+
+#summary{
+    display:flex;
+    justify-content:space-around;
+    font-size:18px;
+    border-bottom:2px solid #1e293b;
+    padding-bottom:10px;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:10px;
+    font-size:14px;
+}
+
+th,td{
+    border:1px solid #1e293b;
+    padding:10px;
+    text-align:center;
+}
+
+th{
+    background:#020617;
+    color:#38bdf8;
+}
+
+tr:nth-child(even){
+    background:#020617;
+}
+
+tr:hover{
+    background:#020617;
+    box-shadow:inset 0 0 10px rgba(0,255,255,0.3);
+}
+
+.SAFE{color:#22c55e;font-weight:bold;}
+.MEDIUM{color:#facc15;font-weight:bold;}
+.HIGH{color:#ef4444;font-weight:bold;}
+
+canvas{
+    width:100% !important;
+    height:100% !important;
+}
+</style>
+</head>
+
+<body>
+
+<header>Student Performance Analytics</header>
+
+<div class="dashboard">
+
+    <div class="left card">
+        <div id="summary">Loading...</div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Roll No</th>
+                    <th>CGPA</th>
+                    <th>Risk</th>
+                </tr>
+            </thead>
+            <tbody id="table"></tbody>
+        </table>
+    </div>
+
+    <div class="right">
+        <div class="card"><canvas id="cgpaChart"></canvas></div>
+        <div class="card"><canvas id="riskChart"></canvas></div>
+    </div>
+
+</div>
+
+<script>
+fetch("/OUTPUT/FY_A.json")
+.then(r=>r.json())
+.then(data=>{
+    document.getElementById("summary").innerHTML = `
+        <div>Class Avg: ${data.classAverage}</div>
+        <div>Topper: Roll ${data.topper.roll}</div>
+        <div>Defaulter: Roll ${data.defaulter.roll}</div>
+    `;
+
+    let tbody="";
+    data.students.forEach(s=>{
+        tbody+=`<tr>
+            <td>${s.roll}</td>
+            <td>${s.cgpa}</td>
+            <td class="${s.risk}">${s.risk}</td>
+        </tr>`;
+    });
+    document.getElementById("table").innerHTML=tbody;
+
+    new Chart(cgpaChart,{
+        type:"bar",
+        data:{
+            labels:data.students.map(s=>s.roll),
+            datasets:[{label:"CGPA",data:data.students.map(s=>s.cgpa)}]
+        }
+    });
+
+    const rc={HIGH:0,MEDIUM:0,SAFE:0};
+    data.students.forEach(s=>rc[s.risk]++);
+
+    new Chart(riskChart,{
+        type:"doughnut",
+        data:{
+            labels:["HIGH","MEDIUM","SAFE"],
+            datasets:[{data:[rc.HIGH,rc.MEDIUM,rc.SAFE]}]
+        }
+    });
+});
+</script>
+
+</body>
+</html>

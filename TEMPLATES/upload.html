@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Upload Class CSV</title>
+<style>
+body{
+  font-family:Segoe UI;
+  background:#0f172a;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100vh;
+  color:white;
+}
+.box{
+  background:#020617;
+  padding:40px;
+  border-radius:12px;
+  text-align:center;
+  box-shadow:0 0 30px rgba(0,0,0,.6);
+}
+button{
+  background:#2563eb;
+  border:none;
+  color:white;
+  padding:12px 20px;
+  border-radius:8px;
+  margin-top:10px;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+<h2>Upload Class Marks</h2>
+<form method="POST" action="/upload" enctype="multipart/form-data">
+  <input type="file" name="file" required>
+  <br><br>
+  <button type="submit">Generate Report</button>
+</form>
+</div>
+
+</body>
+</html>

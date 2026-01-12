@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Student Marks Entry</title>
+
+<style>
+body {
+  font-family: Arial, sans-serif;
+  background: #eef1f5;
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+
+th {
+  background: #2f3640;
+  color: white;
+}
+
+input {
+  width: 80px;
+  padding: 4px;
+  text-align: center;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background: #2f3640;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #1e272e;
+}
+</style>
+</head>
+
+<body>
+
+<h2>Student Marks Entry</h2>
+
+<table>
+<thead>
+<tr>
+<th>Roll</th>
+<th>Attendance</th>
+<th>MSE</th>
+<th>TAE1</th>
+<th>TAE2</th>
+<th>TAE3</th>
+<th>TAE4</th>
+<th>ESE</th>
+</tr>
+</thead>
+<tbody id="tbody">
+</tbody>
+</table>
+
+<button onclick="addRow()">Add Student</button>
+<button onclick="saveData()">Save & Analyze</button>
+
+<script>
+function addRow() {
+  const tbody = document.getElementById("tbody");
+  const row = document.createElement("tr");
+
+  for (let i = 0; i < 8; i++) {
+    const td = document.createElement("td");
+    const input = document.createElement("input");
+    input.type = "number";
+    input.step = "any";
+    td.appendChild(input);
+    row.appendChild(td);
+  }
+  tbody.appendChild(row);
+}
+
+function saveData() {
+  let csv = "roll,attendance,mse,tae1,tae2,tae3,tae4,ese\n";
+  const rows = document.querySelectorAll("#tbody tr");
+
+  rows.forEach(row => {
+    const inputs = row.querySelectorAll("input");
+    if (inputs[0].value === "") return;
+    let values = [];
+    inputs.forEach(i => values.push(i.value));
+    csv += values.join(",") + "\n";
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const formData = new FormData();
+  formData.append("file", blob, "classA.csv");
+
+  fetch("http://127.0.0.1:5000/upload", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.text())
+  .then(msg => {
+    alert(msg);
+    window.open("index.html", "_blank");
+  })
+  .catch(err => alert("Server not running"));
+}
+</script>
+
+</body>
+</html>
