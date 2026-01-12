@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: student-analytics-engine
+    env: python
+    buildCommand: ""
+    startCommand: python API/server.py
